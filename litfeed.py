@@ -1,4 +1,7 @@
+#! /usr/bin/env python
 
+import StringIO
+from rdflib import ConjunctiveGraph
 from lxml import etree
 import simplejson as json
 
@@ -7,7 +10,7 @@ def feed_transform(feed, stylesheet):
     Transform a journal feed into clean BIBO RDF.
     """
     doc = etree.parse(feed)
-    xslt_tree = etree.parse(stylesheet)
+    xslt_tree = etree.parse('xsl/' + stylesheet)
     result = doc.xslt(xslt_tree)
     return(str(result))
 
@@ -15,6 +18,7 @@ def update():
     """
     Update the library with new articles.
     """
+    graph = ConjunctiveGraph()
     # load the existing graph
     library = 'data/articles.rdf'
     graph.load(library)
@@ -31,9 +35,20 @@ def update():
 
     for feed, stylesheet in feeds.iteritems():
         # grab the feed and transform it
+        print "grabbing ", feed
         new = feed_transform(feed, stylesheet)
         # merge the new triples into the graph
-        graph.load(new)
+        graph.parse(StringIO.StringIO(new))
+
+    graph.serialize(library, format='pretty-xml')
+
+
+def main():
+    update()
+
+if __name__ == "__main__":
+    main()
+
 
 
 
