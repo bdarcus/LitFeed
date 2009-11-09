@@ -16,7 +16,7 @@ def update():
     Update the library with new articles.
     """
     # load the existing graph
-    library = 'articles.rdf'
+    library = 'data/articles.rdf'
     graph.load(library)
 
     feeds = {
