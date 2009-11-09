@@ -5,13 +5,17 @@
   xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:foaf="http://xmlns.com/foaf/0.1/"
   xmlns:xsd="http://www.w3.org/2001/XMLSchema#" xmlns:bibo="http://purl.org/ontology/bibo/"
   xmlns:str="http://exslt.org/strings" xmlns:prism="http://prismstandard.org/namespaces/1.2/basic/"
-  xmlns:rss1="http://purl.org/rss/1.0/" exclude-result-prefixes="str atom gr rss1" version="1.0">
+  xmlns:content="http://purl.org/rss/1.0/modules/content/"
+  xmlns:entity="http://wiley.com/wispers/transformer/character-entity-translation"
+  xmlns:html="http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"
+  xmlns:rss1="http://purl.org/rss/1.0/" exclude-result-prefixes="str atom gr rss1 content entity"
+  version="1.0">
 
   <xsl:output indent="yes" method="xml" encoding="UTF-8"/>
   <xsl:strip-space elements="*"/>
 
   <xsl:param name="contributor-map" select="document('contributors.rdf')"/>
-  
+
   <xsl:param name="issue-link">
     <xsl:value-of select="//rss1:channel/@rdf:about"/>
   </xsl:param>
@@ -25,8 +29,21 @@
 
   <xsl:template match="rss1:channel">
     <bibo:Issue rdf:about="{$issue-link}">
-      <xsl:apply-templates select="rss1:title|prism:volume|prism:number"/>
+      <xsl:apply-templates
+        select="rss1:title|prism:volume|prism:number|prism:issn|prism:eIssn|dc:date"/>
     </bibo:Issue>
+  </xsl:template>
+
+  <xsl:template match="prism:issn">
+    <bibo:issn>
+      <xsl:value-of select="."/>
+    </bibo:issn>
+  </xsl:template>
+
+  <xsl:template match="prism:eIssn">
+    <bibo:eissn>
+      <xsl:value-of select="."/>
+    </bibo:eissn>
   </xsl:template>
 
   <xsl:template match="atom:entry|rss1:item|item">
@@ -47,7 +64,7 @@
       <xsl:value-of select="."/>
     </bibo:volume>
   </xsl:template>
-  
+
   <xsl:template match="prism:number">
     <bibo:issue>
       <xsl:value-of select="substring(., 5, 1)"/>
@@ -88,7 +105,14 @@
 
   <xsl:template match="atom:published|pubDate|dc:date">
     <dcterms:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">
-      <xsl:value-of select="substring-before(., 'T')"/>
+      <xsl:choose>
+        <xsl:when test="contains(., 'T')">
+          <xsl:value-of select="substring-before(., 'T')"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="."/>
+        </xsl:otherwise>
+      </xsl:choose>
     </dcterms:issued>
   </xsl:template>
 
