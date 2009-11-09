@@ -23,7 +23,7 @@
   <xsl:template match="/">
     <rdf:RDF>
       <xsl:apply-templates select="//rss1:channel"/>
-      <xsl:apply-templates select="//rss1:item"/>
+      <xsl:apply-templates select="//atom:entry|//rss1:item[prism:section='Papers']|//item"/>
     </rdf:RDF>
   </xsl:template>
 
@@ -33,20 +33,5 @@
         select="rss1:title|prism:volume|prism:number|prism:issn|prism:eIssn|dc:date"/>
     </bibo:Issue>
   </xsl:template>
-
-  <xsl:template match="rss1:item">
-    <xsl:variable name="doi">
-      <xsl:value-of select="substring-after(dc:identifier/@rdf:resource, 'doi:')"/>
-    </xsl:variable>
-    <bibo:AcademicArticle rdf:about="http://dx.doi.org/{$doi}">
-      <xsl:apply-templates select="dc:title|dc:creator|prism:*"/>
-      <bibo:doi>
-	<xsl:value-of select="$doi"/>
-      </bibo:doi>
-      <dcterms:isPartOf rdf:resource="{$issue-link}"/>
-    </bibo:AcademicArticle>
-  </xsl:template>
-
-  <xsl:template match="rss1:item/rss1:title"/>
 
 </xsl:stylesheet>

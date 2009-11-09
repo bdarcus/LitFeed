@@ -11,29 +11,6 @@
   xmlns:rss1="http://purl.org/rss/1.0/" exclude-result-prefixes="str atom gr rss1 content entity"
   version="1.0">
 
-  <xsl:output indent="yes" method="xml" encoding="UTF-8"/>
-  <xsl:strip-space elements="*"/>
-
-  <xsl:param name="contributor-map" select="document('contributors.rdf')"/>
-
-  <xsl:param name="issue-link">
-    <xsl:value-of select="//rss1:channel/@rdf:about"/>
-  </xsl:param>
-
-  <xsl:template match="/">
-    <rdf:RDF>
-      <xsl:apply-templates select="//rss1:channel"/>
-      <xsl:apply-templates select="//atom:entry|//rss1:item|//item"/>
-    </rdf:RDF>
-  </xsl:template>
-
-  <xsl:template match="rss1:channel">
-    <bibo:Issue rdf:about="{$issue-link}">
-      <xsl:apply-templates
-        select="rss1:title|prism:volume|prism:number|prism:issn|prism:eIssn|dc:date"/>
-    </bibo:Issue>
-  </xsl:template>
-
   <xsl:template match="prism:issn">
     <bibo:issn>
       <xsl:value-of select="."/>
@@ -46,14 +23,7 @@
     </bibo:eissn>
   </xsl:template>
 
-  <xsl:template match="atom:entry|rss1:item|item">
-    <bibo:AcademicArticle rdf:about="{rss1:link}">
-      <xsl:apply-templates/>
-      <dcterms:isPartOf rdf:resource="{$issue-link}"/>
-    </bibo:AcademicArticle>
-  </xsl:template>
-
-  <xsl:template match="atom:title|rss1:title">
+  <xsl:template match="atom:title|rss1:title|dc:title">
     <dc:title xml:lang="en">
       <xsl:value-of select="."/>
     </dc:title>
@@ -67,7 +37,7 @@
 
   <xsl:template match="prism:number">
     <bibo:issue>
-      <xsl:value-of select="substring(., 5, 1)"/>
+      <xsl:value-of select="."/>
     </bibo:issue>
   </xsl:template>
 

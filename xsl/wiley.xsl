@@ -34,4 +34,10 @@
     </bibo:Issue>
   </xsl:template>
 
+  <xsl:template match="prism:number">
+    <bibo:issue>
+      <xsl:value-of select="substring(., 5, 1)"/>
+    </bibo:issue>
+  </xsl:template>
+
 </xsl:stylesheet>
