@@ -14,6 +14,7 @@ def feed_transform(feed, stylesheet):
     result = doc.xslt(xslt_tree)
     return(str(result))
 
+
 def update():
     """
     Update the library with new articles.
@@ -36,9 +37,10 @@ def update():
     for feed, stylesheet in feeds.iteritems():
         # grab the feed and transform it
         print "grabbing ", feed
-        new = feed_transform(feed, stylesheet)
+        new = StringIO.StringIO(feed_transform(feed, stylesheet))
         # merge the new triples into the graph
-        graph.parse(StringIO.StringIO(new))
+        graph.parse(new)
+        new.close()
 
     graph.serialize(library, format='pretty-xml')
 
